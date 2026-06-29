@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💖 Surprise Website</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="fc"></canvas>
+<div id="cursor-outer"></div><div id="cursor-inner"></div><div id="cursor-emoji">🌸</div>
+
+<nav id="nav">
+  <a href="index.html">🏠 Home</a>
+  <a href="story.html">🌸 Story</a>
+  <a href="gallery.html">🖼️ Gallery</a>
+  <a href="together.html">🫶 Hamare Pal</a>
+  <a href="message.html">💌 Letter</a>
+  <a href="quiz.html">💭 Quiz</a>
+  <a href="yaadein.html">🫙 Yaadein</a>
+  <a href="waqt.html">⏳ Waqt</a>
+  <a href="duaayein.html">🌟 Duaayein</a>
+  <a href="surprise.html">💍 Surprise</a>
+</nav>
+<button id="music-btn" onclick="toggleMusic()">🎵</button>
+<button id="top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<audio id="bg-music" loop><source src="https://www.bensound.com/bensound-music/bensound-romantic.mp3" type="audio/mpeg"></audio>
+<div id="lightbox">
+  <button id="lb-close" onclick="closeLightbox()">✕</button>
+  <button id="lb-prev" onclick="lbNav(-1)">‹</button>
+  <img id="lb-img" src="" alt="">
+  <button id="lb-next" onclick="lbNav(1)">›</button>
+  <div id="lb-cap"></div>
+</div>
+
+<style>
+#pw-screen{position:fixed;inset:0;z-index:99999;background:linear-gradient(135deg,#fff0f8 0%,#fce4ff 25%,#e8d5ff 55%,#ffd6e8 80%,#fff0f8 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:24px;transition:opacity .8s ease,transform .8s cubic-bezier(.4,0,.2,1);}
+#pw-screen.unlock{opacity:0;transform:scale(1.04);pointer-events:none;}
+.pw-lock-wrap{position:relative;margin-bottom:14px;}
+.pw-lock{font-size:5.5rem;display:block;animation:pw-float 3s ease-in-out infinite;filter:drop-shadow(0 8px 24px rgba(255,107,139,.4));}
+@keyframes pw-float{0%,100%{transform:translateY(0) rotate(-5deg);}50%{transform:translateY(-14px) rotate(5deg);}}
+.pw-ring{position:absolute;inset:-24px;border-radius:50%;border:2px solid rgba(255,107,139,.2);animation:pw-ring-grow 2.4s ease-out infinite;}
+.pw-ring:nth-child(2){animation-delay:.6s;border-color:rgba(165,94,234,.18);}
+.pw-ring:nth-child(3){animation-delay:1.2s;}
+@keyframes pw-ring-grow{0%{transform:scale(.8);opacity:.8;}100%{transform:scale(2.2);opacity:0;}}
+.pw-title{font-family:'Dancing Script',cursive;font-size:clamp(2rem,7vw,3.4rem);font-weight:700;background:linear-gradient(135deg,var(--pink),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;margin-bottom:6px;line-height:1.2;}
+.pw-hint{font-family:'Quicksand',sans-serif;font-weight:600;font-size:.95rem;color:var(--mid);text-align:center;margin-bottom:28px;line-height:1.7;}
+.pw-hint strong{color:var(--pink);}
+.pw-box{background:rgba(255,255,255,.7);backdrop-filter:blur(20px);border:2px solid rgba(255,107,139,.22);border-radius:28px;padding:32px 36px 28px;box-shadow:0 16px 56px rgba(165,94,234,.16),6px 6px 0 rgba(255,179,198,.4);width:100%;max-width:380px;text-align:center;}
+.pw-label{font-size:.82rem;font-weight:700;color:var(--light);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:14px;font-family:'Quicksand',sans-serif;}
+.pw-dots{display:flex;justify-content:center;gap:18px;margin-bottom:24px;}
+.pw-dot{width:16px;height:16px;border-radius:50%;border:2.5px solid var(--pink-l);background:transparent;transition:all .3s cubic-bezier(.34,1.56,.64,1);}
+.pw-dot.filled{background:linear-gradient(135deg,var(--pink),var(--purple));border-color:transparent;transform:scale(1.25);box-shadow:0 4px 12px rgba(255,107,139,.4);}
+.pw-dot.error{background:#ff4f4f;border-color:transparent;}
+.pw-keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
+.pw-key{height:60px;border-radius:18px;border:2px solid rgba(255,107,139,.18);background:rgba(255,255,255,.75);font-family:'Nunito',sans-serif;font-weight:800;font-size:1.4rem;color:var(--text);cursor:pointer;transition:all .22s cubic-bezier(.34,1.56,.64,1);}
+.pw-key:hover{background:linear-gradient(135deg,rgba(255,107,139,.1),rgba(165,94,234,.08));transform:scale(1.07);border-color:var(--pink-l);}
+.pw-key:active{transform:scale(.93);}
+.pw-key.special{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;border:none;box-shadow:0 6px 18px rgba(255,107,139,.35);}
+.pw-key.del{background:rgba(165,94,234,.08);color:var(--purple);font-size:1.1rem;}
+.pw-msg{font-family:'Quicksand',sans-serif;font-weight:600;font-size:.85rem;color:var(--light);min-height:20px;text-align:center;transition:.3s;}
+.pw-msg.error-msg{color:#ff4f4f;} .pw-msg.success-msg{color:#22c55e;}
+@keyframes pw-shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-10px);}40%{transform:translateX(10px);}60%{transform:translateX(-6px);}80%{transform:translateX(6px);}}
+.pw-box.shake{animation:pw-shake .45s ease;}
+.pw-footer{margin-top:22px;font-family:'Quicksand',sans-serif;font-weight:600;font-size:.8rem;color:var(--light);text-align:center;line-height:1.7;}
+</style>
+
+<div id="pw-screen">
+  <div class="pw-lock-wrap">
+    <div class="pw-ring"></div><div class="pw-ring"></div><div class="pw-ring"></div>
+    <span class="pw-lock">🔐</span>
+  </div>
+  <div class="pw-title" id="pw-title">Kuch Khaas Hai Yahan 🌸</div>
+  <div class="pw-hint">Andar jaane ka raaz sirf <strong>tumhe</strong> pata hai —<br>woh pehli mulaqaat, woh din, woh date... 💫</div>
+  <div class="pw-box" id="pw-box">
+    <div class="pw-label">Apna Secret Dalo</div>
+    <div class="pw-dots">
+      <div class="pw-dot" id="d0"></div>
+      <div class="pw-dot" id="d1"></div>
+      <div class="pw-dot" id="d2"></div>
+      <div class="pw-dot" id="d3"></div>
+    </div>
+    <div class="pw-keypad">
+      <button class="pw-key" onclick="pwKey('1')">1</button>
+      <button class="pw-key" onclick="pwKey('2')">2</button>
+      <button class="pw-key" onclick="pwKey('3')">3</button>
+      <button class="pw-key" onclick="pwKey('4')">4</button>
+      <button class="pw-key" onclick="pwKey('5')">5</button>
+      <button class="pw-key" onclick="pwKey('6')">6</button>
+      <button class="pw-key" onclick="pwKey('7')">7</button>
+      <button class="pw-key" onclick="pwKey('8')">8</button>
+      <button class="pw-key" onclick="pwKey('9')">9</button>
+      <button class="pw-key del" onclick="pwDel()">⌫</button>
+      <button class="pw-key" onclick="pwKey('0')">0</button>
+      <button class="pw-key special" onclick="pwCheck()">💖</button>
+    </div>
+    <div class="pw-msg" id="pw-msg">Woh din jo sirf tum jaante ho... 🌸</div>
+  </div>
+  <div class="pw-footer">💕 Kuch cheezein sirf khaas logon ke liye hoti hain 💕</div>
+</div>
+
+<section id="home">
+  <div class="inner" style="text-align:center;">
+    <div class="hero-emoji">🧸</div>
+    <div class="hero-name" id="hero-name">...</div>
+    <div class="hero-title">Yeh page sirf tumhare liye banaya hai 💖</div>
+    <p class="hero-sub">Kuch cheezein alfazon mein nahi kehte — isliye ek poori duniya bana di. Scroll karo, dekho, aur jaano ki tum kitni khaas ho.</p>
+    <div class="hero-btns">
+      <a href="story.html" class="btn-primary">Hamari Kahani 🌸</a>
+      <a href="message.html" class="btn-ghost">Mera Letter Padhna 💌</a>
+    </div>
+    <div class="hearts-row"><span>💕</span><span>🌸</span><span>✨</span><span>💖</span><span>🌸</span><span>💕</span></div>
+  </div>
+</section>
+
+<footer>
+  <span class="footer-alien">👾</span>
+  Made with <span>💖</span> and real feelings &nbsp;·&nbsp; Sirf tumhare liye &nbsp;·&nbsp; Hamesha
+  <div class="footer-hearts">💕 🌸 ✨ 🌸 💕</div>
+  <div style="margin-top:10px;font-size:.78rem;color:var(--light);opacity:.7;">
+    Created by <strong style="color:var(--pink);">Cheenu Sagar</strong> 👾
+  </div>
+</footer>
+<script src="config.js"></script>
+<script src="shared.js"></script>
+<script>
+document.querySelectorAll('nav a').forEach(a=>{ if(a.getAttribute('href')==='index.html') a.classList.add('active'); });
+
+// Load config values into page
+document.getElementById('hero-name').textContent = CONFIG.herName;
+
+// PASSWORD LOGIC
+(function(){
+  const PW  = CONFIG.password;
+  const MAX = PW.length;
+  let entered = '';
+  document.body.style.overflow = 'hidden';
+
+  // Render correct number of dots from config
+  const dotsEl = document.querySelector('.pw-dots');
+  dotsEl.innerHTML = '';
+  for(let i=0;i<MAX;i++){
+    const d=document.createElement('div');
+    d.className='pw-dot';d.id='d'+i;
+    dotsEl.appendChild(d);
+  }
+
+  function updateDots(){
+    for(let i=0;i<MAX;i++){
+      const d=document.getElementById('d'+i);
+      if(!d)return;
+      d.classList.toggle('filled',i<entered.length);
+      d.classList.remove('error');
+    }
+  }
+  window.pwKey=function(k){
+    if(entered.length>=MAX)return;
+    entered+=k; updateDots();
+    document.getElementById('pw-msg').textContent='Woh din jo sirf tum jaante ho... 🌸';
+    document.getElementById('pw-msg').className='pw-msg';
+    if(entered.length===MAX) setTimeout(pwCheck,300);
+  };
+  window.pwDel=function(){entered=entered.slice(0,-1);updateDots();};
+  window.pwCheck=function(){
+    if(entered===PW){
+      document.getElementById('pw-msg').textContent='💖 Sahi hai! Welcome...';
+      document.getElementById('pw-msg').className='pw-msg success-msg';
+      for(let i=0;i<MAX;i++){const d=document.getElementById('d'+i);if(d){d.classList.add('filled');d.style.background='linear-gradient(135deg,#22c55e,#16a34a)';}}
+      setTimeout(()=>{
+        document.getElementById('pw-screen').classList.add('unlock');
+        setTimeout(()=>{
+          document.getElementById('pw-screen').style.display='none';
+          document.body.style.overflow='';
+          launchConfetti();
+        },850);
+      },700);
+    } else {
+      entered='';
+      for(let i=0;i<MAX;i++){const d=document.getElementById('d'+i);if(d)d.classList.add('error');}
+      document.getElementById('pw-msg').textContent='Galat hai 😅 Dobara try karo!';
+      document.getElementById('pw-msg').className='pw-msg error-msg';
+      const box=document.getElementById('pw-box');
+      box.classList.add('shake');
+      setTimeout(()=>{box.classList.remove('shake');updateDots();document.getElementById('pw-msg').textContent='Woh din jo sirf tum jaante ho... 🌸';document.getElementById('pw-msg').className='pw-msg';},900);
+    }
+  };
+  document.addEventListener('keydown',e=>{
+    const pw=document.getElementById('pw-screen');
+    if(!pw||pw.style.display==='none')return;
+    if(e.key>='0'&&e.key<='9') pwKey(e.key);
+    else if(e.key==='Backspace') pwDel();
+    else if(e.key==='Enter') pwCheck();
+  });
+  updateDots();
+})();
+
+</script>
+</body>
+</html>

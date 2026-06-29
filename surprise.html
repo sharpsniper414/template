@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💍 Surprise</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="fc"></canvas>
+<div id="cursor-outer"></div><div id="cursor-inner"></div><div id="cursor-emoji">🌸</div>
+
+<nav id="nav">
+  <a href="index.html">🏠 Home</a>
+  <a href="story.html">🌸 Story</a>
+  <a href="gallery.html">🖼️ Gallery</a>
+  <a href="together.html">🫶 Hamare Pal</a>
+  <a href="message.html">💌 Letter</a>
+  <a href="quiz.html">💭 Quiz</a>
+  <a href="yaadein.html">🫙 Yaadein</a>
+  <a href="waqt.html">⏳ Waqt</a>
+  <a href="duaayein.html">🌟 Duaayein</a>
+  <a href="surprise.html">💍 Surprise</a>
+</nav>
+<button id="music-btn" onclick="toggleMusic()">🎵</button>
+<button id="top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<audio id="bg-music" loop><source src="https://www.bensound.com/bensound-music/bensound-romantic.mp3" type="audio/mpeg"></audio>
+<div id="lightbox">
+  <button id="lb-close" onclick="closeLightbox()">✕</button>
+  <button id="lb-prev" onclick="lbNav(-1)">‹</button>
+  <img id="lb-img" src="" alt="">
+  <button id="lb-next" onclick="lbNav(1)">›</button>
+  <div id="lb-cap"></div>
+</div>
+
+<style>
+#surprise-section{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:110px 20px 64px;position:relative;z-index:1;text-align:center;}
+.surprise-box{background:rgba(255,255,255,.75);border:2.5px dashed var(--pink-l);border-radius:30px;padding:52px 48px 44px;max-width:580px;width:100%;box-shadow:7px 7px 0 var(--pink-l),0 20px 64px var(--shadow);position:relative;}
+.surprise-box::before{content:'💌';position:absolute;top:-20px;left:32px;font-size:2.2rem;}
+.surprise-box::after{content:'🌸';position:absolute;top:-20px;right:32px;font-size:2.2rem;}
+.sq-emoji{font-size:5rem;display:block;margin-bottom:16px;animation:sq-bounce 1.8s ease-in-out infinite;}
+@keyframes sq-bounce{0%,100%{transform:translateY(0) rotate(-5deg);}40%{transform:translateY(-20px) rotate(5deg);}70%{transform:translateY(-8px) rotate(-2deg);}}
+.sq-title{font-family:'Dancing Script',cursive;font-size:clamp(1.8rem,5vw,2.8rem);font-weight:700;background:linear-gradient(135deg,var(--pink),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:12px;line-height:1.2;}
+.sq-sub{font-family:'Quicksand',sans-serif;font-weight:600;font-size:1rem;color:var(--mid);margin-bottom:36px;line-height:1.7;}
+.sq-sub strong{color:var(--pink);}
+.sq-btns{display:flex;justify-content:center;align-items:center;gap:20px;flex-wrap:wrap;position:relative;min-height:80px;}
+.btn-yes{padding:16px 44px;background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;font-family:'Nunito',sans-serif;font-weight:900;font-size:1.15rem;border-radius:50px;border:none;cursor:pointer;box-shadow:0 8px 24px rgba(255,107,139,.4);transition:all .3s cubic-bezier(.34,1.56,.64,1);position:relative;z-index:2;}
+.btn-yes:hover{transform:scale(1.1) translateY(-4px);box-shadow:0 14px 36px rgba(255,107,139,.55);}
+.btn-no{padding:14px 32px;background:rgba(255,255,255,.7);color:var(--mid);font-family:'Nunito',sans-serif;font-weight:800;font-size:1rem;border-radius:50px;border:2px solid var(--pink-l);cursor:pointer;transition:all .2s ease;position:fixed;z-index:999;}
+.no-counter{font-family:'Quicksand',sans-serif;font-weight:600;font-size:.82rem;color:var(--light);margin-top:14px;min-height:20px;}
+#yes-popup{position:fixed;inset:0;z-index:99999;background:rgba(30,10,40,.7);backdrop-filter:blur(16px);display:none;align-items:center;justify-content:center;flex-direction:column;gap:0;padding:20px;}
+#yes-popup.open{display:flex;}
+.popup-box{background:linear-gradient(135deg,#fff0f8,#f5e8ff);border:3px solid var(--pink-l);border-radius:32px;padding:48px 44px 40px;max-width:500px;width:100%;text-align:center;box-shadow:0 24px 80px rgba(165,94,234,.3),8px 8px 0 var(--pink-l);animation:popup-in .6s cubic-bezier(.34,1.56,.64,1);position:relative;}
+@keyframes popup-in{0%{opacity:0;transform:scale(.6) translateY(40px);}100%{opacity:1;transform:scale(1) translateY(0);}}
+.popup-emoji{font-size:5rem;display:block;margin-bottom:16px;animation:sq-bounce 1.5s ease-in-out infinite;}
+.popup-title{font-family:'Dancing Script',cursive;font-size:clamp(2rem,6vw,3rem);font-weight:700;background:linear-gradient(135deg,var(--pink),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:16px;line-height:1.2;}
+.popup-lines{font-family:'Quicksand',sans-serif;font-weight:600;font-size:.98rem;color:var(--mid);line-height:1.9;margin-bottom:28px;}
+.popup-lines span{color:var(--pink);font-weight:700;}
+.popup-close{padding:13px 36px;background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;font-family:'Nunito',sans-serif;font-weight:800;font-size:1rem;border-radius:40px;border:none;cursor:pointer;box-shadow:0 6px 20px rgba(255,107,139,.4);transition:all .3s cubic-bezier(.34,1.56,.64,1);}
+.popup-close:hover{transform:scale(1.08) translateY(-2px);}
+.popup-hearts{position:absolute;top:-16px;left:50%;transform:translateX(-50%);display:flex;gap:6px;font-size:1.4rem;}
+@media(max-width:480px){.surprise-box{padding:36px 20px 32px;}.popup-box{padding:36px 20px 28px;}}
+</style>
+
+<div id="yes-popup">
+  <div class="popup-box">
+    <div class="popup-hearts">💖 💕 💖 💕 💖</div>
+    <span class="popup-emoji">🥹</span>
+    <div class="popup-title" id="popup-title">Main Jaanta Tha! 💖</div>
+    <div class="popup-lines" id="popup-lines"></div>
+    <button class="popup-close" onclick="closePopup()">Aww, Thank You 🌸</button>
+  </div>
+</div>
+
+<section id="surprise-section">
+  <div class="surprise-box reveal">
+    <span class="sq-emoji">🥺</span>
+    <div class="sq-title" id="sq-title">Ek Sawaal Hai 💭</div>
+    <div class="sq-sub" id="sq-sub"></div>
+    <div class="sq-btns">
+      <button class="btn-yes" onclick="yesClicked()">Haan ji! 💖</button>
+      <button class="btn-no" id="btn-no" onmouseover="runAway()" ontouchstart="runAway()">Nahi 🙅</button>
+    </div>
+    <div class="no-counter" id="no-counter"></div>
+  </div>
+</section>
+
+<footer>
+  <span class="footer-alien">👾</span>
+  Made with <span>💖</span> and real feelings &nbsp;·&nbsp; Sirf tumhare liye &nbsp;·&nbsp; Hamesha
+  <div class="footer-hearts">💕 🌸 ✨ 🌸 💕</div>
+  <div style="margin-top:10px;font-size:.78rem;color:var(--light);opacity:.7;">
+    Created by <strong style="color:var(--pink);">Cheenu Sagar</strong> 👾
+  </div>
+</footer>
+<script src="config.js"></script>
+<script src="shared.js"></script>
+<script>
+document.querySelectorAll('nav a').forEach(a=>{ if(a.getAttribute('href')==='surprise.html') a.classList.add('active'); });
+
+// Load from config
+document.getElementById('sq-title').textContent = CONFIG.surpriseQuestion;
+document.getElementById('sq-sub').innerHTML = CONFIG.surpriseSubtext + '<br><strong>' + CONFIG.surpriseQuestion + '</strong><br><span style="font-size:.85rem;color:var(--light);">(No wala button bhaagna chahta hai — aur woh theek bhi hai 😅)</span>';
+document.getElementById('popup-title').textContent = CONFIG.popupTitle;
+const pLines = document.getElementById('popup-lines');
+pLines.innerHTML = CONFIG.popupLines.map(l=>`${l}<br>`).join('<br>');
+
+// No button runs away
+let noCount = 0;
+const noBtn = document.getElementById('btn-no');
+const noPhrases = ['Pakad lo agar pakad sako! 😏','Kahi nahi jaane denge tumhe! 🏃','Yeh button bhaag kyun raha hai? 😅','Lagta hai No ka answer nahi dena 😂','Button bhi jaanta hai sahi jawab! 💖','Arre pakad lo zara! 🤭','Yeh toh thak bhi nahi raha 😭','Shayad No option hi nahi hai 😌','Dil se socho... haan hi sahi lagega 🌸','Congratulations, No button retired ho gaya 😂💕'];
+noBtn.style.left = '55%';
+noBtn.style.top  = (window.innerHeight * 0.55) + 'px';
+window.runAway = function(){
+  noCount++;
+  const maxX=window.innerWidth-120, maxY=window.innerHeight-60;
+  noBtn.style.left = Math.max(10,Math.floor(Math.random()*maxX))+'px';
+  noBtn.style.top  = Math.max(80,Math.floor(Math.random()*maxY))+'px';
+  const scale=Math.max(0.4,1-noCount*0.08);
+  noBtn.style.transform=`scale(${scale})`;
+  noBtn.style.opacity=Math.max(0.3,1-noCount*0.07);
+  const ctr=document.getElementById('no-counter');
+  if(ctr) ctr.textContent=noPhrases[Math.min(noCount-1,noPhrases.length-1)];
+  if(noCount>=10){noBtn.style.display='none';if(ctr)ctr.textContent='😂 No button ne surrender kar diya! Haan bol do ab!';}
+};
+window.yesClicked = function(){
+  document.getElementById('yes-popup').classList.add('open');
+  document.body.style.overflow='hidden';
+  launchConfetti();
+  setTimeout(launchConfetti, 600);
+};
+window.closePopup = function(){
+  document.getElementById('yes-popup').classList.remove('open');
+  document.body.style.overflow='';
+};
+document.getElementById('yes-popup').addEventListener('click',function(e){if(e.target===this)closePopup();});
+
+</script>
+</body>
+</html>

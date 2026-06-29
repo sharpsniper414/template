@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💭 Quiz</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="fc"></canvas>
+<div id="cursor-outer"></div><div id="cursor-inner"></div><div id="cursor-emoji">🌸</div>
+
+<nav id="nav">
+  <a href="index.html">🏠 Home</a>
+  <a href="story.html">🌸 Story</a>
+  <a href="gallery.html">🖼️ Gallery</a>
+  <a href="together.html">🫶 Hamare Pal</a>
+  <a href="message.html">💌 Letter</a>
+  <a href="quiz.html">💭 Quiz</a>
+  <a href="yaadein.html">🫙 Yaadein</a>
+  <a href="waqt.html">⏳ Waqt</a>
+  <a href="duaayein.html">🌟 Duaayein</a>
+  <a href="surprise.html">💍 Surprise</a>
+</nav>
+<button id="music-btn" onclick="toggleMusic()">🎵</button>
+<button id="top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<audio id="bg-music" loop><source src="https://www.bensound.com/bensound-music/bensound-romantic.mp3" type="audio/mpeg"></audio>
+<div id="lightbox">
+  <button id="lb-close" onclick="closeLightbox()">✕</button>
+  <button id="lb-prev" onclick="lbNav(-1)">‹</button>
+  <img id="lb-img" src="" alt="">
+  <button id="lb-next" onclick="lbNav(1)">›</button>
+  <div id="lb-cap"></div>
+</div>
+
+<section id="quiz">
+  <div class="inner" style="max-width:740px;">
+    <h2 class="s-head reveal">💭 Kitna Jaante Ho Mujhe?</h2>
+    <p class="s-sub reveal">Chhote chhote sawaal, sachche sachche jawaab — let's see! 🌸</p>
+    <div class="quiz-card reveal">
+      <div class="quiz-progress" id="qprogress"></div>
+      <div id="qbody"><div style="text-align:center;padding:20px;color:var(--mid);font-family:Quicksand,sans-serif;">Loading... 🌸</div></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span class="footer-alien">👾</span>
+  Made with <span>💖</span> and real feelings &nbsp;·&nbsp; Sirf tumhare liye &nbsp;·&nbsp; Hamesha
+  <div class="footer-hearts">💕 🌸 ✨ 🌸 💕</div>
+  <div style="margin-top:10px;font-size:.78rem;color:var(--light);opacity:.7;">
+    Created by <strong style="color:var(--pink);">Cheenu Sagar</strong> 👾
+  </div>
+</footer>
+<script src="config.js"></script>
+<script src="shared.js"></script>
+<script>
+document.querySelectorAll('nav a').forEach(a=>{ if(a.getAttribute('href')==='quiz.html') a.classList.add('active'); });
+
+(function(){
+  const QS = CONFIG.quizQuestions;
+  let cur=0, score=0, answered=false;
+  function buildProg(){const el=document.getElementById('qprogress');if(!el)return;el.innerHTML=QS.map((_,i)=>`<div class="qp-dot ${i<cur?'done':i===cur?'current':''}"></div>`).join('');}
+  function render(){
+    const body=document.getElementById('qbody');if(!body)return;
+    if(cur>=QS.length){renderScore();return;}
+    answered=false;const q=QS[cur];buildProg();
+    body.innerHTML=`<div class="quiz-q-num">Sawaal ${cur+1} / ${QS.length}</div><div class="quiz-question">${q.q}</div><div class="quiz-options">${q.opts.map((o,i)=>`<button class="quiz-opt" id="qo${i}" onclick="qAns(${i})">${o}</button>`).join('')}</div><div class="quiz-feedback" id="qfb"></div><button class="quiz-next-btn" id="qnxt" onclick="qNext()">Agla Sawaal →</button>`;
+  }
+  window.qAns=function(idx){if(answered)return;answered=true;const q=QS[cur];document.querySelectorAll('.quiz-opt').forEach(o=>o.disabled=true);const fb=document.getElementById('qfb'),nxt=document.getElementById('qnxt');if(idx===q.ans){score++;document.getElementById('qo'+idx).classList.add('correct');fb.textContent='✅ '+q.fc;fb.className='quiz-feedback show fb-correct';}else{document.getElementById('qo'+idx).classList.add('wrong');document.getElementById('qo'+q.ans).classList.add('correct');fb.textContent='❌ '+q.fw;fb.className='quiz-feedback show fb-wrong';}if(nxt)nxt.classList.add('show');};
+  window.qNext=function(){cur++;render();};
+  function renderScore(){buildProg();const body=document.getElementById('qbody');const pct=Math.round((score/QS.length)*100);let em,ti,ms;if(pct===100){em='🏆';ti='Perfect Score!';ms='Wah! Sab sahi tha — tum bahut khaas insaan ho 💖';}else if(pct>=60){em='💖';ti='Bahut Acha!';ms='Kaafi pata hai — baki toh saath rehte pata chal jaayega 🌸';}else{em='🌸';ti='Sweet Try!';ms='Score se kuch nahi hota — feeling sahi hai toh sab maaf 💕';}body.innerHTML=`<div class="quiz-score-wrap"><span class="qs-emoji">${em}</span><div class="qs-title">${score}/${QS.length} — ${ti}</div><div class="qs-msg">${ms}</div><button class="quiz-next-btn show" onclick="qRestart()">Phir Se Khelein 🔄</button></div>`;}
+  window.qRestart=function(){cur=0;score=0;answered=false;render();};
+  render();
+})();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🖼️ Gallery</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="fc"></canvas>
+<div id="cursor-outer"></div><div id="cursor-inner"></div><div id="cursor-emoji">🌸</div>
+
+<nav id="nav">
+  <a href="index.html">🏠 Home</a>
+  <a href="story.html">🌸 Story</a>
+  <a href="gallery.html">🖼️ Gallery</a>
+  <a href="together.html">🫶 Hamare Pal</a>
+  <a href="message.html">💌 Letter</a>
+  <a href="quiz.html">💭 Quiz</a>
+  <a href="yaadein.html">🫙 Yaadein</a>
+  <a href="waqt.html">⏳ Waqt</a>
+  <a href="duaayein.html">🌟 Duaayein</a>
+  <a href="surprise.html">💍 Surprise</a>
+</nav>
+<button id="music-btn" onclick="toggleMusic()">🎵</button>
+<button id="top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<audio id="bg-music" loop><source src="https://www.bensound.com/bensound-music/bensound-romantic.mp3" type="audio/mpeg"></audio>
+<div id="lightbox">
+  <button id="lb-close" onclick="closeLightbox()">✕</button>
+  <button id="lb-prev" onclick="lbNav(-1)">‹</button>
+  <img id="lb-img" src="" alt="">
+  <button id="lb-next" onclick="lbNav(1)">›</button>
+  <div id="lb-cap"></div>
+</div>
+
+<section id="gallery">
+  <div class="inner" style="max-width:1100px;">
+    <h2 class="s-head reveal">🖼️ Tumhari Zindagi, Hamare Rang</h2>
+    <p class="s-sub reveal">Woh tasveerein jo dil mein utar jaati hain — hamesha ke liye.</p>
+    <div class="gallery-grid reveal" id="gallery-grid"></div>
+  </div>
+</section>
+
+<footer>
+  <span class="footer-alien">👾</span>
+  Made with <span>💖</span> and real feelings &nbsp;·&nbsp; Sirf tumhare liye &nbsp;·&nbsp; Hamesha
+  <div class="footer-hearts">💕 🌸 ✨ 🌸 💕</div>
+  <div style="margin-top:10px;font-size:.78rem;color:var(--light);opacity:.7;">
+    Created by <strong style="color:var(--pink);">Cheenu Sagar</strong> 👾
+  </div>
+</footer>
+<script src="config.js"></script>
+<script src="shared.js"></script>
+<script>
+document.querySelectorAll('nav a').forEach(a=>{ if(a.getAttribute('href')==='gallery.html') a.classList.add('active'); });
+
+const grid = document.getElementById('gallery-grid');
+const rots = ['-3deg','2deg','-1.5deg','3deg','-2.5deg','1.5deg','-2deg','2.5deg','-1deg','3.5deg','-3.5deg','1deg'];
+const stickers = ['⭐','🌸','💫','🎀','💖','✨','🌷','💕','🌺','💝','🌹','💌'];
+const imgArr = CONFIG.galleryPhotos.map(p=>({src:'photos/'+p.file, cap:p.caption}));
+CONFIG.galleryPhotos.forEach((photo, i) => {
+  const div = document.createElement('div');
+  div.className = 'polaroid';
+  div.style.setProperty('--rot', rots[i % rots.length]);
+  div.innerHTML = `
+    <div class="polaroid-sticker">${stickers[i % stickers.length]}</div>
+    <div class="polaroid-img"><img src="photos/${photo.file}" alt="Memory ${i+1}" loading="lazy"></div>
+    <div class="polaroid-caption">${photo.caption}</div>`;
+  div.onclick = () => openLightbox('photos/'+photo.file, photo.caption, imgArr, i);
+  grid.appendChild(div);
+});
+// re-apply tilt after dynamic render
+document.querySelectorAll('.polaroid').forEach(card=>{card.addEventListener('mousemove',e=>{const r=card.getBoundingClientRect();const dx=(e.clientX-r.left-r.width/2)/(r.width/2);const dy=(e.clientY-r.top-r.height/2)/(r.height/2);card.style.transform=`rotate(0deg) scale(1.05) translateY(-10px) rotateY(${dx*12}deg) rotateX(${-dy*12}deg)`;});card.addEventListener('mouseleave',()=>{card.style.transform='';});});
+
+</script>
+</body>
+</html>
