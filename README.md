@@ -34,11 +34,11 @@ site/
 
 ```js
 const CONFIG = {
-  password: "2011",                    // 4 digit password
-  herName: "Saloni",                   // Uska naam
+  password: "0000"                   // 4 digit password
+  herName: "Name",                   // Uska naam
   yourName: "Tumhara",                 // Tumhara naam/nickname
-  specialDate: "2021-11-20",           // YYYY-MM-DD format
-  specialDateDisplay: "20 November 2021",
+  specialDate: "Special Date",           // YYYY-MM-DD format
+  specialDateDisplay: "28 june 2026",
   ...
 }
 ```
